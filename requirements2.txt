@@ -1,0 +1,12 @@
+brotlipy==0.7.0
+certifi==2020.12.5
+cffi @ file:///C:/ci/cffi_1613247431367/work
+cryptography @ file:///C:/ci/cryptography_1615505390781/work
+idna @ file:///tmp/build/80754af9/idna_1593446292537/work
+pycparser @ file:///tmp/build/80754af9/pycparser_1594388511720/work
+pyOpenSSL @ file:///tmp/build/80754af9/pyopenssl_1594392929924/work
+PySocks @ file:///C:/ci/pysocks_1605307512533/work
+six==1.15.0
+urllib3 @ file:///tmp/build/80754af9/urllib3_1603305693037/work
+win-inet-pton @ file:///C:/ci/win_inet_pton_1605306162074/work
+wincertstore==0.2
