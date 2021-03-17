@@ -1,2 +1,4 @@
 .ipynb_checkpoints/
 .vscode/
+# Development file with tokenized reviews
+DisneylandReviews_Tokenized.csv
