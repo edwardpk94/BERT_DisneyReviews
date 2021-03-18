@@ -38,12 +38,11 @@ class DisneyReviewsDataset(Dataset):
                                                                             max_length=1024))
 
 class BertDisneyReviews(torch.nn.Module):
-    def __init__(self, bert_model_name):
+    def __init__(self, device, bert_model_name):
         super(BertDisneyReviews, self).__init__()
-        self.device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-
+        self.device = device
         # Create the model. Output label is a single scalar (the review score)
-        self.encoder = BertForSequenceClassification.from_pretrained(bert_model_name)
+        self.encoder = BertForSequenceClassification.from_pretrained(bert_model_name, num_labels=1)
 
     def forward(self):
         pass
@@ -51,6 +50,7 @@ class BertDisneyReviews(torch.nn.Module):
 def main():
     batch_size = 3
     num_workers = 8
+    device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     model_name = 'bert-base-uncased'
     csv_file = './DisneylandReviews.csv'
     csv_file = './DisneylandReviews_Tokenized.csv'
@@ -58,9 +58,27 @@ def main():
     loader = torch.utils.data.DataLoader(dataset,
                 batch_size=batch_size,
                 num_workers=num_workers)
-    model = BertDisneyReviews(model_name)
+    model = BertDisneyReviews(device, model_name)
+    model.to(device)
 
-    pdb.set_trace()
+    optimizer = torch.optim.SGD(net.parameters(), lr=0.2)
+    loss_func = torch.nn.MSELoss()  # this is for regression mean squared loss
+
+    my_images = []
+    fig, ax = plt.subplots(figsize=(12,7))
+
+    # train the network
+    for t in range(200):
+    
+        prediction = net(x)     # input x and predict based on x
+
+        loss = loss_func(prediction, y)     # must be (1. nn output, 2. target)
+
+        optimizer.zero_grad()   # clear gradients for next train
+        loss.backward()         # backpropagation, compute gradients
+        optimizer.step()        # apply gradients
+
+        pdb.set_trace()
 
 if __name__ == "__main__":
     main()
