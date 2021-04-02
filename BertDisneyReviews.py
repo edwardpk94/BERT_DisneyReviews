@@ -61,7 +61,7 @@ class DisneyReviewsDataset(Dataset):
         elif in_file_ob.suffix == '.csv':
             df = pd.read_csv(in_file, encoding='iso-8859-1', na_values='missing', index_col=0)
             DEBUG = True
-            DEBUG_NUM_ROWS = 1000
+            DEBUG_NUM_ROWS = 100
             if DEBUG:
                 df = df.iloc[0:DEBUG_NUM_ROWS]
 
@@ -76,7 +76,9 @@ class DisneyReviewsDataset(Dataset):
                     self.encodings.update(tokenizer(curr_review_texts,
                         add_special_tokens=True,
                         padding='max_length',
+                        max_length=512,
                         truncation=True))
+
                     pbar.update(chunksize)
             
             self.ratings = df['Rating'].tolist()
@@ -111,14 +113,15 @@ class DisneyReviewsDataset(Dataset):
 #         return self.model(input_ids)
 
 def main():
-    batch_size = 1
-    num_workers = 8
+    batch_size = 3
+    num_workers = 1
     NUM_EPOCHES = 10
     # How often to print out the training results
     PRINT_FREQUENCY = 10
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     device = 'cpu'
     model_name = 'bert-base-uncased'
+    # model_name = 'distilbert-base-uncased'
     in_file = './DisneylandReviews.csv'
     # in_file = './DisneylandReviews_Tokenized.pkl'
 
@@ -152,6 +155,7 @@ def main():
         running_loss = 0.0
         for count, data in enumerate(train_loader):
             input_ids, ratings, attention_mask = data['input_ids'].to(device), data['ratings'].to(device), data['attention_mask'].to(device)
+            pdb.set_trace()
             outputs = model(input_ids, labels=ratings, attention_mask=attention_mask)
             optimizer.zero_grad()
             pdb.set_trace()
