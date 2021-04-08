@@ -16,37 +16,6 @@ from sklearn.metrics import mean_squared_error
 
 import pdb
 
-# def create_dataset(in_file, bert_model_name):
-#     in_file_ob = Path(in_file)
-#     if in_file_ob.suffix == '.pkl':
-#         # Pickle file already contains tokens
-#         with open(in_file, 'rb') as file:
-#             df = pickle.load(file)
- 
-#     elif in_file_ob.suffix == '.csv':
-#         df = pd.read_csv(in_file, encoding='iso-8859-1', na_values='missing', index_col=0)
-#         DEBUG = True
-#         DEBUG_NUM_ROWS = 1000
-#         if DEBUG:
-#             df = df.iloc[0:1000]
-
-#         tokenizer = BertTokenizer.from_pretrained(bert_model_name, do_lower_case=True)
-
-#         review_texts = df['Review_Text'].tolist()
-#         encodings = tokenizer(review_texts,
-#                 add_special_tokens=True,
-#                 padding='max_length',
-#                 max_length=512,
-#                 truncation=True)
-
-#         pdb.set_trace()
-
-#         encodings = tokenizer()
-#     X = torch.tensor(df['Encoding'].tolist())
-#     Y = torch.tensor(df['Rating'].tolist())
-#     pdb.set_trace()
-#     return TensorDataset(X, Y)
-
 class DisneyReviewsDataset(Dataset):
     def __init__(self, in_file, bert_model_name, debug=False, num_debug_rows=None):
         self.bert_model_name = bert_model_name
@@ -85,12 +54,6 @@ class DisneyReviewsDataset(Dataset):
                             self.encodings[key] = self.encodings[key] + value
                         else:
                             self.encodings[key] = value
-   
-                    # self.encodings.update(tokenizer(curr_review_texts,
-                    #     add_special_tokens=True,
-                    #     padding='max_length',
-                    #     max_length=512,
-                    #     truncation=True))
 
                     pbar.update(chunksize)
 
@@ -112,11 +75,6 @@ class DisneyReviewsDataset(Dataset):
         item = {key: torch.tensor(val[index]) for key, val in self.encodings.items()}
         item['ratings'] = torch.tensor(self.ratings[index])
         return item
-
-    # TODO ADD NORMALIZATION TO THE RATINGS INPUTS
-    # def normalize(self)
-    #     pass
-
 
 class BertDisneyReviews(torch.nn.Module):
     def __init__(self, device, model_name):
@@ -142,11 +100,10 @@ def main():
     num_workers = 8
     NUM_EPOCHES = 20
     learning_rate = 0.0001
-    # How often to print out the training results
     PRINT_FREQUENCY = 200
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     model_name = 'bert-base-uncased'
-    # model_name = 'distilbert-base-uncased'
+    model_name = 'distilbert-base-uncased'
     in_file = './DisneylandReviews.csv'
 
     dataset = DisneyReviewsDataset(in_file, model_name, debug=debug, num_debug_rows=num_debug_rows)
@@ -171,8 +128,10 @@ def main():
     # model = BertForSequenceClassification.from_pretrained(model_name)
     model.train()
     model.to(device)
+    
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
     # optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate, momentum=0.9)
+
     loss_func = torch.nn.MSELoss()
     print('\nstarting training loop...')
     loss_history = []
